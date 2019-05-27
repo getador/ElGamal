@@ -69,7 +69,7 @@ namespace ElGamalCriptografic.Classes
                     {
                         if (alphabet.Contains(message[i]))
                         {
-                            int index = alphabet.Select((x, ind) => new { element = x, index = ind }).First(y => y.element == message[i]).index + 1;
+                            int index = alphabet.Select((x, ind) => new { element = x, index = ind }).First(y => y.element == message[i]).index;
                             a += BigInteger.ModPow(g, k, p) + " ";
                             b += BigInteger.ModPow(BigInteger.Pow(y, (int)k) * index, 1, p) + " ";
                         }
@@ -99,7 +99,7 @@ namespace ElGamalCriptografic.Classes
                 {
                     for (int i = 0, length = encriptA.Length; i < length; i++)
                     {
-                        str += alphabet[(int)BigInteger.ModPow(BigInteger.Parse(encriptB[i]) * BigInteger.Pow(BigInteger.Parse(encriptA[i]), (int)(p - 1 - x)), 1, p) - 1];
+                        str += alphabet[(int)BigInteger.ModPow(BigInteger.Parse(encriptB[i]) * BigInteger.Pow(BigInteger.Parse(encriptA[i]), (int)(p - 1 - x)), 1, p)];
                     }
                 }
             }
@@ -121,7 +121,7 @@ namespace ElGamalCriptografic.Classes
                 {
                     for (int i = 0, length = encriptA.Length; i < length; i++)
                     {
-                        str += alphabet[(int)BigInteger.ModPow(BigInteger.Parse(encriptB[i]) * BigInteger.Pow(BigInteger.Parse(encriptA[i]), (int)(p - 1 - x)), 1, p) - 1];
+                        str += alphabet[(int)BigInteger.ModPow(BigInteger.Parse(encriptB[i]) * BigInteger.Pow(BigInteger.Parse(encriptA[i]), (int)(p - 1 - x)), 1, p)];
                     }
                 }
             }
