@@ -79,6 +79,7 @@ namespace ElGamalCriptografic.Classes
                 {
                     stream.WriteLine(a);
                     stream.WriteLine(b);
+                    stream.WriteLine(ToString());
                 }
             }
         }
@@ -120,7 +121,6 @@ namespace ElGamalCriptografic.Classes
                 {
                     for (int i = 0, length = encriptA.Length; i < length; i++)
                     {
-                        //str += BigInteger.ModPow(BigInteger.Parse(encriptB[i]) * BigInteger.Pow(BigInteger.Parse(encriptA[i]), (int)(p - 1 - x)), 1, p);
                         str += alphabet[(int)BigInteger.ModPow(BigInteger.Parse(encriptB[i]) * BigInteger.Pow(BigInteger.Parse(encriptA[i]), (int)(p - 1 - x)), 1, p)];
                     }
                 }
