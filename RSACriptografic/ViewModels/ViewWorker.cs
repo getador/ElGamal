@@ -1,25 +1,26 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Input;
-using System.Windows;
-using ElGamalCriptografic.Classes;
+﻿using ElGamalCriptografic.Classes;
 using Microsoft.Win32;
+using System;
+using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.IO;
+using System.Linq;
+using System.Reflection;
+using System.Windows.Input;
 
 namespace ElGamalCriptografic.ViewModels
 {
-    class ViewWorker : INotifyPropertyChanged
+    internal class ViewWorker : INotifyPropertyChanged
     {
-        static Random random = new Random();
-        CriptoWorker first;
+        private static readonly Random random = new Random();
+        private readonly CriptoWorker first;
         public ViewWorker()
         {
             EncriptMessageA = "";
             EncriptMessageB = "";
+            Type t = typeof(Alphabet);
+            FieldInfo[] fields = t.GetFields();
+            AlphabetItem = new ObservableCollection<string>(fields.Select(x => x.Name).ToArray());
             first = new CriptoWorker(1000, random);
             StatusFirst = first.ToString().Replace(" ", Environment.NewLine);
         }
@@ -28,7 +29,7 @@ namespace ElGamalCriptografic.ViewModels
         private uint pElement;
         public uint PElement
         {
-            get { return pElement; }
+            get => pElement;
             set
             {
                 if (value == pElement)
@@ -40,7 +41,7 @@ namespace ElGamalCriptografic.ViewModels
         private uint qElement;
         public uint QElement
         {
-            get { return qElement; }
+            get => qElement;
             set
             {
                 if (value == qElement)
@@ -52,7 +53,7 @@ namespace ElGamalCriptografic.ViewModels
         private uint mElement;
         public uint MElement
         {
-            get { return mElement; }
+            get => mElement;
             set
             {
                 if (value == mElement)
@@ -64,7 +65,7 @@ namespace ElGamalCriptografic.ViewModels
         private uint dElement;
         public uint DElement
         {
-            get { return dElement; }
+            get => dElement;
             set
             {
                 if (value == dElement)
@@ -76,7 +77,7 @@ namespace ElGamalCriptografic.ViewModels
         private uint eElement;
         public uint EElement
         {
-            get { return eElement; }
+            get => eElement;
             set
             {
                 if (value == eElement)
@@ -88,7 +89,7 @@ namespace ElGamalCriptografic.ViewModels
         private uint nElement;
         public uint NElement
         {
-            get { return nElement; }
+            get => nElement;
             set
             {
                 if (value == nElement)
@@ -102,7 +103,7 @@ namespace ElGamalCriptografic.ViewModels
         private string statusFirst;
         public string StatusFirst
         {
-            get { return statusFirst; }
+            get => statusFirst;
             set
             {
                 if (value == statusFirst)
@@ -116,7 +117,7 @@ namespace ElGamalCriptografic.ViewModels
         private string encriptMessageA;
         public string EncriptMessageA
         {
-            get { return encriptMessageA; }
+            get => encriptMessageA;
             set
             {
                 if (value == encriptMessageA)
@@ -129,7 +130,7 @@ namespace ElGamalCriptografic.ViewModels
         private string encriptMessageB;
         public string EncriptMessageB
         {
-            get { return encriptMessageB; }
+            get => encriptMessageB;
             set
             {
                 if (value == encriptMessageB)
@@ -142,7 +143,7 @@ namespace ElGamalCriptografic.ViewModels
         private string unEncriptMessage;
         public string UnEncriptMessage
         {
-            get { return unEncriptMessage; }
+            get => unEncriptMessage;
             set
             {
                 if (value == unEncriptMessage)
@@ -154,66 +155,71 @@ namespace ElGamalCriptografic.ViewModels
         private string forEncript;
         public string ForEncript
         {
-            get { return forEncript; }
-            set { forEncript = value; }
+            get => forEncript;
+            set => forEncript = value;
         }
-        public ICommand EncriptBtnClick
-        {
-            get
-            {
-                return new DelegateCommand((obj) =>
-                {
-                    if (first!=null)
-                    {
-                        //ChangeElementInClass();
-                        first.Encript(forEncript, "alphabetRuLow");
-                        EncriptMessageA = first.A;
-                        EncriptMessageB = first.B;
-                    }
-                });
-            }
-        }
-        public ICommand UnEncriptBtnClick
-        {
-            get
-            {
-                return new DelegateCommand((obj) =>
-                {
-                    if (first != null)
-                    {
-                        //ChangeElementInClass();
-                        UnEncriptMessage = $@"{first.Uncript(EncriptMessageA,EncriptMessageB,"alphabetRuLow")}";
-                    }
-                });
-            }
-        }
-        public ICommand UnEncriptBtnFromFile
-        {
-            get
-            {
-                return new DelegateCommand((obj) =>
-                {
-                    OpenFileDialog openFileDialog = new OpenFileDialog();
-                    if (openFileDialog.ShowDialog() == true)
-                    {
-                        string a, b;
-                        using (StreamReader stream = new StreamReader(openFileDialog.FileName))
-                        {
-                            a = stream.ReadLine();
-                            b = stream.ReadLine();
-                        }
-                        if (a != string.Empty &&
-                            b != string.Empty &&
-                            a.Length == b.Length)
-                            UnEncriptMessage = $@"{first.Uncript(a, b, "alphabetRuLow")}";
 
-                        //ChangeElementInClass();
-                        //StreamReader reader = new StreamReader(openFileDialog.FileName);
-                        //UnEncriptMessage = $@"{first.ToUnEncript(reader.ReadLine())}";
-                    }
-                });
+        private ObservableCollection<string> alphabetItem;
+        public ObservableCollection<string> AlphabetItem
+        {
+            get => alphabetItem;
+            set
+            {
+                alphabetItem = value;
+                OnPropertyChanged("AlphabetItem");
             }
         }
+
+        private string selectedAlphabetItem;
+        public string SelectedAlphabetItem
+        {
+            get => selectedAlphabetItem;
+            set
+            {
+                selectedAlphabetItem = value;
+                OnPropertyChanged("SelectedAlphabetItem");
+            }
+        }
+
+        public ICommand EncriptBtnClick => new DelegateCommand((obj) =>
+                                                         {
+                                                             if (first != null)
+                                                             {
+                                                                 //ChangeElementInClass();
+                                                                 first.Encript(forEncript, SelectedAlphabetItem);
+                                                                 EncriptMessageA = first.A;
+                                                                 EncriptMessageB = first.B;
+                                                             }
+                                                         });
+        public ICommand UnEncriptBtnClick => new DelegateCommand((obj) =>
+                                                           {
+                                                               if (first != null)
+                                                               {
+                                                                   //ChangeElementInClass();
+                                                                   UnEncriptMessage = $@"{first.Uncript(EncriptMessageA, EncriptMessageB, SelectedAlphabetItem)}";
+                                                               }
+                                                           });
+        public ICommand UnEncriptBtnFromFile => new DelegateCommand((obj) =>
+                                                              {
+                                                                  OpenFileDialog openFileDialog = new OpenFileDialog();
+                                                                  if (openFileDialog.ShowDialog() == true)
+                                                                  {
+                                                                      string a, b;
+                                                                      using (StreamReader stream = new StreamReader(openFileDialog.FileName))
+                                                                      {
+                                                                          a = stream.ReadLine();
+                                                                          b = stream.ReadLine();
+                                                                      }
+                                                                      if (a != string.Empty &&
+                                                                          b != string.Empty &&
+                                                                          a.Length == b.Length)
+                                                                          UnEncriptMessage = $@"{first.Uncript(a, b, SelectedAlphabetItem)}";
+
+                                                                      //ChangeElementInClass();
+                                                                      //StreamReader reader = new StreamReader(openFileDialog.FileName);
+                                                                      //UnEncriptMessage = $@"{first.ToUnEncript(reader.ReadLine())}";
+                                                                  }
+                                                              });
 
         public event PropertyChangedEventHandler PropertyChanged;
 
