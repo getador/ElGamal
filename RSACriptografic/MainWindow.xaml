@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:ElGamalCriptografic"
         xmlns:ViewA="clr-namespace:ElGamalCriptografic.ViewModels"
         mc:Ignorable="d"
-        Title="MainWindow" Height="263.6" Width="325.6">
+        Title="MainWindow" Height="276" MinHeight="276" MinWidth="266" Width="266" ResizeMode="NoResize">
     <Window.DataContext>
         <ViewA:ViewWorker/>
     </Window.DataContext>
@@ -14,15 +14,10 @@
         <Button Command="{Binding EncriptBtnClick}" HorizontalAlignment="Left" Content="Зашифровать" VerticalAlignment="Top" Width="115" Height="30"/>
         <TextBox Text="{Binding ForEncript}" HorizontalAlignment="Left" Height="23" Margin="0,35,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="115"/>
         <Button Command="{Binding UnEncriptBtnClick}" Content="Расшифровать" HorizontalAlignment="Left" Margin="120,0,0,0" VerticalAlignment="Top" Width="115" Height="30"/>
-        <TextBox Text="{Binding StatusFirst}" HorizontalAlignment="Left" Height="114" Margin="0,90,0,0" TextWrapping="Wrap"  VerticalAlignment="Top" Width="115"/>
-        <TextBox Text="{Binding EncriptMessage}" HorizontalAlignment="Left" Height="23" Margin="0,62,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="115"/>
+        <TextBox Text="{Binding StatusFirst}" HorizontalAlignment="Left" Height="84" Margin="0,120,0,0" TextWrapping="Wrap"  VerticalAlignment="Top" Width="115"/>
+        <TextBox Text="{Binding EncriptMessageA}" HorizontalAlignment="Left" Height="23" Margin="0,62,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="115"/>
+        <TextBox Text="{Binding EncriptMessageB}" HorizontalAlignment="Left" Height="23" Margin="0,92,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="115"/>
         <TextBox Text="{Binding UnEncriptMessage}" HorizontalAlignment="Left" Height="23" Margin="120,35,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="115"/>
-        <TextBox HorizontalAlignment="Left" Height="17" Margin="154,90,0,0" TextWrapping="Wrap" Text="{Binding PElement}" VerticalAlignment="Top" Width="120"/>
-        <TextBox HorizontalAlignment="Left" Height="17" Margin="154,107,0,0" TextWrapping="Wrap" Text="{Binding QElement}" VerticalAlignment="Top" Width="120"/>
-        <TextBox HorizontalAlignment="Left" Height="17" Margin="154,124,0,0" TextWrapping="Wrap" Text="{Binding MElement}" VerticalAlignment="Top" Width="120"/>
-        <TextBox HorizontalAlignment="Left" Height="17" Margin="154,141,0,0" TextWrapping="Wrap" Text="{Binding DElement}" VerticalAlignment="Top" Width="120"/>
-        <TextBox HorizontalAlignment="Left" Height="17" Margin="154,158,0,0" TextWrapping="Wrap" Text="{Binding EElement}" VerticalAlignment="Top" Width="120"/>
-        <TextBox HorizontalAlignment="Left" Height="17" Margin="154,175,0,0" TextWrapping="Wrap" Text="{Binding NElement}" VerticalAlignment="Top" Width="120"/>
         <Button Command="{Binding UnEncriptBtnFromFile}" Content="Расшифровать с файла" HorizontalAlignment="Left" Margin="0,209,0,0" VerticalAlignment="Top" Width="155"/>
     </Grid>
 </Window>
