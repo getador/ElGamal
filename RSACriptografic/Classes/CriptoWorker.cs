@@ -7,203 +7,155 @@ using System.Security.Cryptography;
 using System.IO;
 using System.Numerics;
 using System.Diagnostics.Contracts;
+using System.Reflection;
 
 namespace ElGamalCriptografic.Classes
 {
     class CriptoWorker
     {
-        uint p;
-        uint q;
-        uint n;
-        uint m;
-        uint d;
-        uint e;
+        BigInteger p;
+        BigInteger g;
+        BigInteger x;
+        BigInteger y;
+        BigInteger k;
+        string a;
+        string b;
 
-        public CriptoWorker(int maxValue,Random random)
-        {
-            if (maxValue<2)
-            {
-                maxValue = 3;
-            }
-            p = 0;
-            q = 0;
-            while (!SimpleNumberWorker.IsPrime(p))
-            {
-                p = (uint)random.Next(3,maxValue);
-            }
-            while (!SimpleNumberWorker.IsPrime(q))
-            {
-                q = (uint)random.Next(3, maxValue);
-            }
-            n = p * q;
-            m = (p - 1) * (q - 1);
+        public BigInteger P { get => p; set => p = value; }
+        public BigInteger G { get => g; set => g = value; }
+        public BigInteger X { get => x; set => x = value; }
+        public BigInteger Y { get => y; set => y = value; }
+        public BigInteger K { get => k; set => k = value; }
+        public string A { get => a; set => a = value; }
+        public string B { get => b; set => b = value; }
 
-            d = (uint)CalculateD((int)m);
-            //d = m;
-            //while (!SimpleNumberWorker.IsMutuallyPrimary(d,m))
-            //{
-            //    d = (uint)random.Next((int)m-1);
-            //}
-            e = (uint)CalculateE((int)d, (int)m);
-        }
-        private int CalculateD(int m)
-        {
-            int d = m - 1;
-            for (int i = 2; i <= m; i++)
-            {
-                if ((m % i == 0) && (d % i == 0))
-                {
-                    d--;
-                    i = 1;
-                }
-            }
-            return d;
-        }
-        private int CalculateE(int d, int m)
-        {
-            int e = 10;
-            while ((e * d % m) != 1)
-            {
-                e++;
-            }
-            return e;
-        }
-        public CriptoWorker(uint p, uint q, uint n, uint m, uint d, uint e)
+        public CriptoWorker(BigInteger p, BigInteger g,Random random)
         {
             this.p = p;
-            this.q = q;
-            this.n = n;
-            this.m = m;
-            this.d = d;
-            this.e = e;
+            this.g = g;
+            GenerateElements(random);
         }
-        /// <summary>
-        /// Шифрование RSA
-        /// </summary>
-        /// <param name="message">Сообщение для зашифровки</param>
-        /// <param name="e">Первый элемент открытого ключа</param>
-        /// <param name="n">Второй элемент открытого ключа</param>
-        /// <returns>Зашифрованое сообщение</returns>
-        public string Encript(string message)
+        public CriptoWorker(int maxValue,Random random)
         {
-            message = message.ToLower();
-            string encriptMessage = "";
-            BigInteger biN = new BigInteger(n);
-            for (int i = 0; i < message.Length; i++)
-            {
-                int index = Array.IndexOf(Alphabet.alphabet.ToCharArray(), message[i]);
-                if (index <= n&&index!=-1)
-                {
-                    BigInteger bi = new BigInteger(index);
-                    bi = BigInteger.Pow(bi, (int)e);
-                    bi %= biN;
-                    encriptMessage += bi.ToString() + "|";
-                }
-            }
-            //for (int i = 0; i < message.Length; i++)
-            //{
-            //    int index = 0;
-            //    for (int j = 0; j < Alphabet.alphabet.Length; j++)
-            //    {
-            //        if (message[i]==Alphabet.alphabet[j])
-            //        {
-            //            index = j;
-            //            qwer.Add(index);
-            //            break;
-            //        }
-            //    }
-            //    if (index<n)
-            //    {
-            //        encriptMessage += Convert.ToString((int)(Math.Pow(index, e) % n)) + "|";
-            //    }
-            //    else
-            //    {
-            //        encriptMessage += " ";
-            //    }
-            //}
-            using (StreamWriter stream = new StreamWriter("1.txt", false))
-            {
-                stream.WriteLine(encriptMessage);
-                stream.WriteLine(ToString());
-            }
-            return encriptMessage;
+            if (maxValue<100)
+                maxValue = 100;
+            while (!SimpleNumberWorker.IsPrime(p))
+                p = random.Next(33, maxValue);
+            g = SimpleNumberWorker.FindPrimitive(p);
+            GenerateElements(random);
         }
-        public List<int> qwer = new List<int>();
-        public string ToUnEncript(string message)
-        {
-            string unEncriptMessage = "";
-            string[] arrayElement = message.Split(new char[] { '|' }, StringSplitOptions.RemoveEmptyEntries);
-            BigInteger biN = new BigInteger(n);
-            for (int i = 0; i < arrayElement.Length; i++)
-            {
-                int num = Convert.ToInt32(arrayElement[i]);
-                BigInteger bi = new BigInteger(num);
-                bi = BigInteger.Pow(bi, (int)d);
-                bi %= biN;
-                int index = Convert.ToInt32(bi.ToString());
-                try
-                {
-                    unEncriptMessage += Alphabet.alphabet[index].ToString();
-                }
-                catch (Exception)
-                {
 
+        public CriptoWorker(BigInteger p, BigInteger g, BigInteger x, BigInteger y, BigInteger k)
+        {
+            this.p = p;
+            this.g = g;
+            this.x = x;
+            this.y = y;
+            this.k = k;
+        }
+
+        public void Encript(string message,string alphabetName)
+        {
+            if (message != null)
+            {
+                a = string.Empty;
+                b = string.Empty;
+                Type t = typeof(Alphabet);
+                FieldInfo field = t.GetField(alphabetName);
+                if (field != null)
+                {
+                    string alphabet = (string)field.GetValue(null);
+                    for (int i = 0; i < message.Length; i++)
+                    {
+                        if (alphabet.Contains(message[i]))
+                        {
+                            int index = alphabet.Select((x, ind) => new { element = x, index = ind }).First(y => y.element == message[i]).index;
+                            a += BigInteger.ModPow(g, k, p) + " ";
+                            b += BigInteger.ModPow(BigInteger.Pow(y, (int)k) * index, 1, p) + " ";
+                        }
+                    }
+                }
+                using (StreamWriter stream = new StreamWriter("Encript.txt", false))
+                {
+                    stream.WriteLine(a);
+                    stream.WriteLine(b);
                 }
             }
-            //return unEncriptMessage;
-            //for (int i = 0; i < arrayElement.Length; i++)
-            //{
-            //    //try
-            //    //{
-            //    //unEncriptMessage += Convert.ToString((int)(Math.Pow(int.Parse(arrayElement[i]), d) % n)) + "|";
+        }
 
-            //    unEncriptMessage += Convert.ToString(Alphabet.alphabet[(int)(Math.Pow(int.Parse(arrayElement[i]), d) % n)]);
-            //    //}
-            //    //catch (Exception)
-            //    //{
-            //    //}                
-            //}
-            using (StreamWriter stream = new StreamWriter("2.txt",false))
-            {
-                stream.WriteLine(unEncriptMessage);
-                stream.WriteLine(ToString());
-            }
-            return unEncriptMessage;
-        }
-        public uint FindEelement(Random random)
+        public string Uncript(string alphabetName)
         {
-            uint element = 10;
-            //for (int i = 2; i < m; i++)
-            //{
-            //    if (i*d==1%m)
-            //    {
-            //        element = (uint)i;
-            //        break;
-            //    }
-            //}
-            while ((element * d % m) != 1)
+            string str = string.Empty;
+            Type t = typeof(Alphabet);
+            FieldInfo field = t.GetField(alphabetName);
+
+            if (a != string.Empty && b != string.Empty && field!=null)
             {
-                element++;// = (uint)random.Next((int)m - 1);
+                string alphabet = (string)field.GetValue(null);
+                string[] encriptA = a.Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+                string[] encriptB = b.Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+                if (encriptA.Length==encriptB.Length)
+                {
+                    for (int i = 0, length = encriptA.Length; i < length; i++)
+                    {
+                        str += alphabet[(int)BigInteger.ModPow(BigInteger.Parse(encriptB[i]) * BigInteger.Pow(BigInteger.Parse(encriptA[i]), (int)(p - 1 - x)), 1, p)];
+                    }
+                }
             }
-            //for (int i = 0; i < m; i++)
-            //{
-            //    if ((i*d)%m==1)
-            //    {
-            //        element = (uint)i;
-            //        break;
-            //    }
-            //}
-            return element;
+            return str;
         }
+
+        public string Uncript(string a,string b,string alphabetName)
+        {
+            string str = string.Empty;
+            Type t = typeof(Alphabet);
+            FieldInfo field = t.GetField(alphabetName);
+
+            if (a != string.Empty && b != string.Empty && field != null)
+            {
+                string alphabet = (string)field.GetValue(null);
+                string[] encriptA = a.Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+                string[] encriptB = b.Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+                if (encriptA.Length == encriptB.Length)
+                {
+                    for (int i = 0, length = encriptA.Length; i < length; i++)
+                    {
+                        //str += BigInteger.ModPow(BigInteger.Parse(encriptB[i]) * BigInteger.Pow(BigInteger.Parse(encriptA[i]), (int)(p - 1 - x)), 1, p);
+                        str += alphabet[(int)BigInteger.ModPow(BigInteger.Parse(encriptB[i]) * BigInteger.Pow(BigInteger.Parse(encriptA[i]), (int)(p - 1 - x)), 1, p)];
+                    }
+                }
+            }
+            return str;
+        }
+
         public override string ToString()
         {
-            return $"P={p} Q={Q} M={M} D={D} E={E} N={N}";
+            return $"{p} {g} {x} {y} {k}";
         }
-        public uint P { get => p; set => p = value; }
-        public uint Q { get => q; set => q = value; }
-        public uint M { get => m; set => m = value; }
-        public uint D { get => d; set => d = value; }
-        public uint E { get => e; set => e = value; }
-        public uint N { get => n; set => n = value; }
+
+        private void GenerateElements(Random random)
+        {
+            SetX(random);
+            SetY();
+            SetK(random);
+        }
+
+        private void SetX(Random random)
+        {
+            x = 2;
+            while (!SimpleNumberWorker.IsPrime(x))
+                x = random.Next(2, (int)p - 1);
+        }
+
+        private void SetY()
+        {
+            y = BigInteger.ModPow(g, x, p);
+        }
+        private void SetK(Random random)
+        {
+            k = 2;
+            while (!SimpleNumberWorker.IsMutuallyPrimary(k, p - 1))
+                k = random.Next(2, (int)p - 1);
+        }
     }
 }
