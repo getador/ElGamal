@@ -6,8 +6,8 @@ using System.Threading.Tasks;
 
 namespace ElGamalCriptografic.Classes
 {
-    class Alphabet
+    static class Alphabet
     {
-        public static readonly string alphabet = "абвгдеёжзийклмнопрстуфхцчшщъыьэюя";
+        public static readonly string alphabetRuLow = "абвгдеёжзийклмнопрстуфхцчшщъыьэюя";
     }
 }
