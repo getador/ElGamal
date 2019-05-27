@@ -9,5 +9,6 @@ namespace ElGamalCriptografic.Classes
     static class Alphabet
     {
         public static readonly string alphabetRuLow = "абвгдеёжзийклмнопрстуфхцчшщъыьэюя";
+        public static readonly string alphabetRuUP = "АБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ";
     }
 }
