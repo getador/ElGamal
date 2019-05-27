@@ -18,31 +18,10 @@ namespace ElGamalCriptografic.ViewModels
         CriptoWorker first;
         public ViewWorker()
         {
-            EncriptMessage = "";
-            first = new CriptoWorker(30, random);
-            ChangElementForAdd();
+            EncriptMessageA = "";
+            EncriptMessageB = "";
+            first = new CriptoWorker(1000, random);
             StatusFirst = first.ToString().Replace(" ", Environment.NewLine);
-        }
-
-        private void ChangElementForAdd()
-        {
-            pElement = first.P;
-            QElement = first.Q;
-            MElement = first.M;
-            DElement = first.D;
-            EElement = first.E;
-            NElement = first.N;
-        }
-
-        private void ChangeElementInClass()
-        {
-            first.P = pElement;
-            first.Q = QElement;
-            first.M = MElement;
-            first.D = DElement;
-            first.E = EElement;
-            first.N = NElement;
-            StatusFirst = first.ToString().Replace(" ",Environment.NewLine);
         }
 
         #region для шифратора
@@ -133,20 +112,33 @@ namespace ElGamalCriptografic.ViewModels
             }
         }
 
-        public event PropertyChangedEventHandler PropertyChanged;
 
-        private string encriptMessage;
-        public string EncriptMessage
+        private string encriptMessageA;
+        public string EncriptMessageA
         {
-            get { return encriptMessage; }
+            get { return encriptMessageA; }
             set
             {
-                if (value == encriptMessage)
+                if (value == encriptMessageA)
                     return;
-                encriptMessage = value;
-                OnPropertyChanged("EncriptMessage");
+                encriptMessageA = value;
+                OnPropertyChanged("EncriptMessageA");
             }
         }
+
+        private string encriptMessageB;
+        public string EncriptMessageB
+        {
+            get { return encriptMessageB; }
+            set
+            {
+                if (value == encriptMessageB)
+                    return;
+                encriptMessageB = value;
+                OnPropertyChanged("EncriptMessageB");
+            }
+        }
+
         private string unEncriptMessage;
         public string UnEncriptMessage
         {
@@ -173,8 +165,10 @@ namespace ElGamalCriptografic.ViewModels
                 {
                     if (first!=null)
                     {
-                        ChangeElementInClass();
-                        EncriptMessage = $@"{first.Encript(forEncript)}";
+                        //ChangeElementInClass();
+                        first.Encript(forEncript, "alphabetRuLow");
+                        EncriptMessageA = first.A;
+                        EncriptMessageB = first.B;
                     }
                 });
             }
@@ -187,8 +181,8 @@ namespace ElGamalCriptografic.ViewModels
                 {
                     if (first != null)
                     {
-                        ChangeElementInClass();
-                        UnEncriptMessage = $@"{first.ToUnEncript(EncriptMessage)}";
+                        //ChangeElementInClass();
+                        UnEncriptMessage = $@"{first.Uncript(EncriptMessageA,EncriptMessageB,"alphabetRuLow")}";
                     }
                 });
             }
@@ -202,13 +196,27 @@ namespace ElGamalCriptografic.ViewModels
                     OpenFileDialog openFileDialog = new OpenFileDialog();
                     if (openFileDialog.ShowDialog() == true)
                     {
-                        ChangeElementInClass();
-                        StreamReader reader = new StreamReader(openFileDialog.FileName);
-                        UnEncriptMessage = $@"{first.ToUnEncript(reader.ReadLine())}";
+                        string a, b;
+                        using (StreamReader stream = new StreamReader(openFileDialog.FileName))
+                        {
+                            a = stream.ReadLine();
+                            b = stream.ReadLine();
+                        }
+                        if (a != string.Empty &&
+                            b != string.Empty &&
+                            a.Length == b.Length)
+                            UnEncriptMessage = $@"{first.Uncript(a, b, "alphabetRuLow")}";
+
+                        //ChangeElementInClass();
+                        //StreamReader reader = new StreamReader(openFileDialog.FileName);
+                        //UnEncriptMessage = $@"{first.ToUnEncript(reader.ReadLine())}";
                     }
                 });
             }
         }
+
+        public event PropertyChangedEventHandler PropertyChanged;
+
         private void OnPropertyChanged(string propertyName)
         {
             if (PropertyChanged != null)
